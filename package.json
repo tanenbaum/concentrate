@@ -1,8 +1,12 @@
 {
-  "name": "config-server",
+  "name": "concentrate",
   "version": "0.0.1",
   "description": "Simple, extensible, centralised config server.",
-  "main": "app.js",
+  "main": "src/app.js",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/tanenbaum/concentrate.git"
+  },
   "dependencies": {
     "express": "^4.10.2",
     "underscore": "^1.7.0"
