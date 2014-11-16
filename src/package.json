@@ -1,0 +1,22 @@
+{
+  "name": "config-server",
+  "version": "0.0.1",
+  "description": "Simple, extensible, centralised config server.",
+  "main": "app.js",
+  "dependencies": {
+    "express": "^4.10.2",
+    "underscore": "^1.7.0"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "config",
+    "server",
+    "remote",
+    "centralised"
+  ],
+  "author": "Joe Shaw",
+  "license": "ISC"
+}
