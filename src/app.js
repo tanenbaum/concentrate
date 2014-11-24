@@ -3,14 +3,57 @@
 
 var express = require('express');
 
+var basicAuth = require('basic-auth-connect');
+
+// we're using json-local to load the config for the config loader...
+var config = require('./config');
+
 var app = express();
 
-var env = app.get('env') || 'development';
+var env = process.env.NODE_ENV || 'development';
 
-var server = app.listen(3000, function () {
+var settings = config(
+    { 
+        module: './config_providers/json-local', 
+        options: {
+            source: '../env.json', // <- this is not ideal.
+        }
+    });
 
-    var host = server.address().address;
-    var port = server.address().port;
+if (env === 'development') {
+    app.use(basicAuth(function (user, pass) {
+        return user === 'test' && pass === 'test';
+    }));
+}
 
-    console.log('Config server listening at %s:%s', host, port);
-});
+settings(env).then(function (settings) {
+
+    app.route('/areas')
+        .get(function (req, res) {
+            res.send('areas get');
+        })
+        .post(function (req, res) {
+            res.send('areas post');
+        });
+
+    app.route('/areas/:id')
+        .get(function (req, res) {
+            res.send('area get ' + req.params.id);
+        })
+        .put(function (req, res) {
+            res.send('area put');
+        })
+        .delete(function (req, res) {
+            res.send('area delete');
+        });
+
+    // TODO: load port number from environment first
+    var server = app.listen(settings.port, function () {
+
+        var host = server.address().address;
+        var port = server.address().port;
+
+        console.log('Config server listening at %s:%s', host, port);
+    });
+
+}, console.log);
