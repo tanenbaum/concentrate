@@ -1,7 +1,7 @@
 /*jslint node: true */
 'use strict';
 
-var Promise = require('promise');
+var P = require('promise');
 
 var _ = require('underscore');
 
@@ -10,7 +10,7 @@ module.exports = function (options) {
 
     var loadConfig = function (area) {
 
-        return new Promise(function (resolve, reject) {
+        return new P(function (resolve, reject) {
 
             var config;
             try {

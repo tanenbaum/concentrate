@@ -1,5 +1,3 @@
-// Some example config for the local json config tests.
-
 {
     "s1": {
         "config": {
@@ -21,6 +19,7 @@
             "b": "potato",
             "e": 5,
             "f": "geoff"
-        }
+        },
+        "extend": "s2"
     }
 }
