@@ -28,6 +28,10 @@ if (env === 'development') {
 
 settings(env).then(function (settings) {
 
+    if (env !== 'development') {
+        app.use(require(settings.auth));
+    }
+
     app.route('/areas')
         .get(function (req, res) {
             res.send('areas get');
@@ -47,7 +51,6 @@ settings(env).then(function (settings) {
             res.send('area delete');
         });
 
-    // TODO: load port number from environment first
     var server = app.listen(settings.port, function () {
 
         var host = server.address().address;
