@@ -3,15 +3,11 @@
 
 var P = require('promise');
 
-var _ = require('underscore');
-
 module.exports = function (options) {
     var source = options.source;
 
-    var loadConfig = function (area) {
-
+    return function (area) {
         return new P(function (resolve, reject) {
-
             var config;
             try {
                 config = require(source);
@@ -20,27 +16,7 @@ module.exports = function (options) {
                 return reject(e);
             }
 
-            var defaults = _.clone(config[area] || config);
-            var extend = defaults.extend;
-
-            if (area && extend) {
-                // shortcut
-                if (area === extend) {
-                    return resolve(defaults.config);
-                }
-
-                return resolve(_.defaults(defaults, loadConfig(extend)));
-            }
-
-            if (area) {
-                return resolve(defaults.config);
-            }
-
-            return resolve(defaults);
+            resolve(config[area]);
         });
-
-        
     };
-
-    return loadConfig;
 };

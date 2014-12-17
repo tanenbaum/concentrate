@@ -21,5 +21,17 @@
             "f": "geoff"
         },
         "extend": "s2"
+    },
+    "s4": {
+        "config": {},
+        "extend": ["s1", "s2", "s3"]
+    },
+    "s5": {
+        "config": {},
+        "extend": ["s1"]
+    },
+    "s6": {
+        "config": {},
+        "extend": []
     }
 }
