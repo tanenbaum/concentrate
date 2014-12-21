@@ -2,7 +2,7 @@
 'use strict';
 
 var _ = require('underscore');
-var P = require('Promise');
+var P = require('promise');
 var async = require('async');
 
 module.exports = function (settings) {
