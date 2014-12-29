@@ -2,11 +2,12 @@
 'use strict';
 
 var P = require('promise');
+var _ = require('underscore');
 
 module.exports = function (options) {
     var source = options.source;
 
-    return function (area) {
+    var get = function (area) {
         return new P(function (resolve, reject) {
             var config;
             try {
@@ -16,7 +17,15 @@ module.exports = function (options) {
                 return reject(e);
             }
 
+            if (area === undefined) {
+                resolve(_.keys(config));
+            }
+
             resolve(config[area]);
         });
+    };
+
+    return {
+        get: get
     };
 };

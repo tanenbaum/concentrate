@@ -59,4 +59,7 @@ settings(env).then(function (settings) {
         console.log('Config server listening at %s:%s', host, port);
     });
 
-}, console.log);
+}, function(err) {
+    console.log('Error in config server setup.');
+    console.log(err);
+});

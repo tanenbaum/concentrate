@@ -11,11 +11,18 @@ var localJson = require('../src/config')(
 
 var localConfig = require('./config.json');
 
+exports.getAreaNames = function (test) {
+    localJson.get().then(function (areas) {
+        test.deepEqual(areas, _.keys(localConfig));
+        test.done();
+    });
+};
+
 function testConfigEquals(test, config, local, area) {
-    config(area).then(function (settings) {
+    config.get(area).then(function (settings) {
         console.log(local);
         console.log(settings);
-        test.ok(_.isEqual(local, settings));
+        test.deepEqual(local, settings);
         test.done();
     });
 }
