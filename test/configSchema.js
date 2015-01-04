@@ -8,7 +8,7 @@ function validObject(o) {
     return !validate(o, schema).errors.length;
 }
 
-exports.validSchema = function(test) {
+exports.validateSchema = function(test) {
 
     test.ok(validObject({ area: 'foo', config: {}}), 'Valid schema, with area.');
     test.ok(validObject({ area: 'foo', config: { a: 1, b: [1, 2, 3]}}), 'Valid schema, with complex config.');

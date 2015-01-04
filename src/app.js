@@ -16,7 +16,7 @@ var settings = config(
     { 
         module: './config_providers/json-local', 
         options: {
-            source: '../env.json', // <- this is not ideal.
+            source: './env.json'
         }
     });
 

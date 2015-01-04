@@ -6,7 +6,7 @@ var _ = require('underscore');
 var localJson = require('../src/config')(
         {
             module: './config_providers/json-local',
-            source: '../../test/config.json'
+            source: './test/config.json'
         });
 
 var localConfig = require('./config.json');

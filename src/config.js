@@ -2,8 +2,10 @@
 'use strict';
 
 var _ = require('underscore');
-var async = require('async');
 var P = require('promise');
+var parallel = P.denodeify(require('async').parallel);
+var validate = require('jsonschema').validate;
+var schema = require('./schema.json');
 
 module.exports = function (settings) {
     var configProvider = require(settings.module)(settings);
@@ -18,9 +20,10 @@ module.exports = function (settings) {
         }
 
         // area is specified, get config
-        return configProvider.get(area).then(function (config) {          
+        return configProvider.get(area).then(function (config) {
 
             var defaults = _.clone(config);
+            var defaultConfig = defaults.config || {};
             var extend = defaults.extend;
 
             if (extend) {
@@ -28,23 +31,17 @@ module.exports = function (settings) {
                 if (extend instanceof Array) {
                     if (extend.length) {
                         if (extend.length > 1) {
-                            return new P(function (resolve, reject) {
-                                return async.parallel(
+                            return parallel(
                                     _.map(extend, function (e) {
                                         return function (callback) { 
                                             return getArea(e).then(function (c) { callback(null, c); } , callback);
                                         };
-                                    }),
-                                    function (err, configs) {
-                                        if (err) {
-                                            reject(err);
-                                        }
-                                        resolve(_.reduce(
+                                    })).then(function (configs) {
+                                        return _.reduce(
                                             configs, 
                                             function (memo, c) { return _.defaults(memo, c); }, 
-                                            defaults.config));
+                                            defaultConfig);
                                     });
-                            });
                         }
                         else {
                             // just one element?
@@ -52,27 +49,40 @@ module.exports = function (settings) {
                         }
                     }
                     else {
-                        return defaults.config;
+                        return defaultConfig;
                     }
                 }
 
                 // shortcut
                 if (area === extend) {
-                    return defaults.config;
+                    return defaultConfig;
                 }
 
                 return getArea(extend).then(function (extendConfig) {
-                    return _.defaults(defaults.config, extendConfig);
+                    return _.defaults(defaultConfig, extendConfig);
                 });
             }
 
-            return defaults.config;
+            return defaultConfig;
         });
+    };
+
+    var setArea = function (area) {
+
+        var validation = validate(area, schema);
+        if (validation.errors.length) {
+            return P.reject(validation.errors);
+        }
+
+        return configProvider.set(area).then(function () {
+            return getArea(area.area);
+        });
+
     };
 
     return {
         get: getArea,
-        set: function () {},
+        set: setArea,
         delete: function () {}
     };
 };
