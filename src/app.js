@@ -2,6 +2,7 @@
 'use strict';
 
 var express = require('express');
+var bodyParser = require('body-parser');
 
 var basicAuth = require('basic-auth-connect');
 
@@ -12,12 +13,10 @@ var app = express();
 
 var env = process.env.NODE_ENV || 'development';
 
-var settings = config(
+var settings = new config(
     { 
-        module: './config_providers/json-local', 
-        options: {
-            source: './env.json'
-        }
+        module: './config_providers/json-local',
+        source: './env.json'
     });
 
 if (env === 'development') {
@@ -26,30 +25,22 @@ if (env === 'development') {
     }));
 }
 
-settings(env).then(function (settings) {
+app.use(bodyParser.json());
+
+// .done forces exceptions to get thrown up to the host
+settings.get(env).done(function (settings) {
 
     if (env !== 'development') {
         app.use(require(settings.auth));
     }
 
-    app.route('/areas')
-        .get(function (req, res) {
-            res.send('areas get');
-        })
-        .post(function (req, res) {
-            res.send('areas post');
-        });
+    // config provider middleware
+    app.use(function (req, res, next) {
+        req.provider = new config(settings.configProvider);
+        next();
+    });
 
-    app.route('/areas/:id')
-        .get(function (req, res) {
-            res.send('area get ' + req.params.id);
-        })
-        .put(function (req, res) {
-            res.send('area put');
-        })
-        .delete(function (req, res) {
-            res.send('area delete');
-        });
+    app.use(require(settings.routes));
 
     var server = app.listen(settings.port, function () {
 

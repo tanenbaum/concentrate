@@ -22,8 +22,11 @@ module.exports = function(grunt) {
 
   grunt.loadNpmTasks('grunt-contrib-jshint');
   grunt.loadNpmTasks('grunt-contrib-nodeunit');
+  grunt.loadNpmTasks('grunt-express-server');
 
-  grunt.registerTask('test', ['jshint', 'nodeunit']);
+  grunt.registerTask('lint', 'jshint');
+
+  grunt.registerTask('unit', 'nodeunit');
 
   grunt.registerTask('default', ['jshint', 'nodeunit']);
 

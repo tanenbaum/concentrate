@@ -11,6 +11,7 @@
     "async": "^0.9.0",
     "azure-storage": "^0.4.0",
     "basic-auth-connect": "^1.0.0",
+    "body-parser": "^1.10.1",
     "express": "^4.10.2",
     "jsonschema": "^1.0.0",
     "promise": "^6.0.1",
@@ -20,6 +21,7 @@
     "grunt": "^0.4.5",
     "grunt-contrib-jshint": "^0.10.0",
     "grunt-contrib-nodeunit": "^0.4.1",
+    "grunt-express-server": "^0.4.19",
     "nodeunit": "^0.9.0"
   },
   "scripts": {

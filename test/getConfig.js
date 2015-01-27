@@ -2,8 +2,10 @@
 'use strict';
 
 var _ = require('underscore');
+var errors = require('../src/errors');
+var config = require('../src/config');
 
-var localJson = require('../src/config')(
+var localJson = new config(
         {
             module: './config_providers/json-local',
             source: './test/config.json'
@@ -14,6 +16,13 @@ var localConfig = require('./config.json');
 exports.getAreaNames = function (test) {
     localJson.get().then(function (areas) {
         test.deepEqual(areas, _.keys(localConfig));
+        test.done();
+    });
+};
+
+exports.areaNotFound = function (test) {
+    localJson.get('foo').then(function () {}, function (err) {
+        test.ok(err instanceof errors.NotFound);
         test.done();
     });
 };
@@ -54,4 +63,12 @@ exports.localConfigExtendOne = function (test) {
 
 exports.localConfigExtendEmpty = function (test) {
     testConfigEquals(test, localJson, {}, 's6');
+};
+
+exports.makeSureCacheIsUsed = function (test) {
+    localJson.get.cache = {};
+    localJson.get('s4').then(function () {
+        test.deepEqual(_.keys(localJson.get.cache), ['s4', 's1', 's2', 's3']);
+        test.done();
+    });
 };

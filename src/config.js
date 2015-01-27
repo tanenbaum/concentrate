@@ -7,20 +7,35 @@ var parallel = P.denodeify(require('async').parallel);
 var validate = require('jsonschema').validate;
 var schema = require('./schema.json');
 
+var errors = require('./errors');
+
 module.exports = function (settings) {
+    var self = this;
+
     var configProvider = require(settings.module)(settings);
 
-    var getArea = function (area) {
+    // cache result of get all areas
+    // TODO: this never gets cleared on area removal - is it necessary?
+    var getAreas = _.once(function () {
+        return configProvider.get();
+    });
+
+    // memoize result of getting individual area
+    var getArea = _.memoize(function (area) {
+        return configProvider.get(area);
+    });
+
+    self.get = _.memoize(function (area) {
 
         // area is undefined, get area names
         if (area === undefined) {
-            return configProvider.get().then(function (areas) {
+            return getAreas().then(function (areas) {
                 return areas;
             });
         }
 
         // area is specified, get config
-        return configProvider.get(area).then(function (config) {
+        return getArea(area).then(function (config) {
 
             var defaults = _.clone(config);
             var defaultConfig = defaults.config || {};
@@ -34,7 +49,7 @@ module.exports = function (settings) {
                             return parallel(
                                     _.map(extend, function (e) {
                                         return function (callback) { 
-                                            return getArea(e).then(function (c) { callback(null, c); } , callback);
+                                            return self.get(e).then(function (c) { callback(null, c); } , callback);
                                         };
                                     })).then(function (configs) {
                                         return _.reduce(
@@ -58,31 +73,41 @@ module.exports = function (settings) {
                     return defaultConfig;
                 }
 
-                return getArea(extend).then(function (extendConfig) {
+                return self.get(extend).then(function (extendConfig) {
                     return _.defaults(defaultConfig, extendConfig);
                 });
             }
 
             return defaultConfig;
         });
+    });
+
+    var clearCache = function () {
+        getArea.cache = {};
+        self.get.cache = {};
     };
 
-    var setArea = function (area) {
+    self.set = function (area) {
 
         var validation = validate(area, schema);
-        if (validation.errors.length) {
-            return P.reject(validation.errors);
+        if (validation.errors && validation.errors.length) {
+            return P.reject(new errors.InvalidJson(validation.errors));
         }
 
         return configProvider.set(area).then(function () {
-            return getArea(area.area);
+            // empty the cache
+            clearCache();
+            return self.get(area.area);
         });
 
     };
 
-    return {
-        get: getArea,
-        set: setArea,
-        delete: function () {}
+    self.remove = function (area) {
+
+        return configProvider.remove(area).then(function () {
+            // empty the cache
+            clearCache();
+        });
+
     };
 };
