@@ -2,7 +2,7 @@
 'use strict';
 
 var validate = require('jsonschema').validate;
-var schema = require('../src/schema.json');
+var schema = require('../../src/schema.json');
 
 function validObject(o) {
     return !validate(o, schema).errors.length;

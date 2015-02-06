@@ -22,7 +22,8 @@
     "grunt-contrib-jshint": "^0.10.0",
     "grunt-contrib-nodeunit": "^0.4.1",
     "grunt-express-server": "^0.4.19",
-    "nodeunit": "^0.9.0"
+    "nodeunit": "^0.9.0",
+    "request-promise": "^0.3.3"
   },
   "scripts": {
     "test": "nodeunit test"

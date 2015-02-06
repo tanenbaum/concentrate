@@ -2,13 +2,13 @@
 'use strict';
 
 var _ = require('underscore');
-var errors = require('../src/errors');
-var config = require('../src/config');
+var errors = require('../../src/errors');
+var config = require('../../src/config');
 
 var localJson = new config(
         {
             module: './config_providers/json-local',
-            source: './test/config.json'
+            source: './test/unit_test/config.json'
         });
 
 var localConfig = require('./config.json');

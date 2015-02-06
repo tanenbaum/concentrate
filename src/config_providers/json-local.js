@@ -7,32 +7,42 @@ var readFile = P.denodeify(require('fs').readFile);
 var writeFile = P.denodeify(require('fs').writeFile);
 var errors = require('../errors');
 
+// Read file and parse json async
+var parseJson = function (source) {
+
+    return readFile(source).then(function (raw) {
+        try {
+            return P.resolve(JSON.parse(raw));
+        } catch (e) {
+            if (e instanceof SyntaxError) {
+                return P.reject('Syntax error in raw json file.');
+            }
+            return P.reject('Something bad happened when parsing json.');
+        }
+    });
+
+};
+
 module.exports = function (options) {
     var source = options.source;
 
     var get = function (area) {
 
-        return readFile(source).then(function (raw) {
+        return parseJson(source).then(function (config) {
+                if (area === undefined) {
+                    return _.keys(config);
+                }
 
-            var config = JSON.parse(raw);
+                if (_.has(config, area))
+                    return config[area];
 
-            if (area === undefined) {
-                return _.keys(config);
-            }
-
-            if (_.has(config, area))
-                return config[area];
-
-            throw new errors.NotFound('Area not found.');
-        });
-
+                throw new errors.NotFound('Area not found.');
+            });
     };
 
     var set = function (area) {
         
-        return readFile(source).then(function (raw) {
-
-            var config = JSON.parse(raw);
+        return parseJson(source).then(function (config) {
 
             config[area.area] = _.omit(area, 'area');
 
@@ -46,9 +56,7 @@ module.exports = function (options) {
 
     var remove = function (area) {
 
-        return readFile(source).then(function (raw) {
-
-            var config = JSON.parse(raw);
+        return parseJson(source).then(function (config) {
 
             if (!_.has(config, area)) {
                 throw new errors.NotFound('Area not found.');

@@ -1,6 +1,7 @@
 /*jslint node: true */
 'use strict';
 
+var util = require('util');
 var _ = require('underscore');
 
 var errors = require('./errors');
@@ -24,23 +25,34 @@ router.route('/areas')
     .get(function (req, res) {
         req.provider.get().then(function (areas) {
             res.json(areas);
-        }, reject);
+        }, reject(res));
     })
     // POST: create a new area, or replace an existing one
     .post(function (req, res) {
-        console.log(req.body);
-        req.provider.set(req.body).then(function (config) {
-            res.json(config);
-        }, function (err) {
-            if (err instanceof errors.InvalidJson) {
+        var validName = req.provider.get().then(function (areas) {
+            if (_.contains(areas, req.body.area)) {
                 res.status(400).json({
-                    message: err.message,
-                    error: err.errors
+                    message: util.format('Area with name %s already exists.', req.body.area)
                 });
             }
-
-            reject(res)(err);
         });
+
+        validName.then(function () {
+            req.provider.set(req.body).then(
+                function (config) {
+                    res.json(config);
+                }, 
+                function (err) {
+                    if (err instanceof errors.InvalidJson) {
+                        res.status(400).json({
+                            message: err.message,
+                            error: err.errors
+                        });
+                    }
+
+                    reject(res)(err);
+                });
+            });
     });
 
 router.route('/areas/:id') 
@@ -52,24 +64,25 @@ router.route('/areas/:id')
             }
 
             res.status(404).json('Area does not exist');
-        }, reject);
+        }, reject(res));
     })
     // GET: config for a specific area
     .get(function (req, res) {
         req.provider.get(req.params.id).then(function (config) {
             res.json(config);
-        }, reject);
+        }, reject(res));
     })
-    // PUT: partially update specific config elements
+    // PUT: update specific config elements
     .put(function (req, res) {
-        // TODO: partial PUT logic
-        res.send('area put');
+        req.provider.set(req.body).then(function (config) {
+            res.json(config);
+        }, reject(res));
     })
     // delete a config area
     .delete(function (req, res) {
         req.provider.remove(req.params.id).then(function () {
             res.status(200).end();
-        }, reject);
+        }, reject(res));
     });
 
 module.exports = router;

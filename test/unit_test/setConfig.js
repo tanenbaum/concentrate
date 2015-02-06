@@ -3,19 +3,19 @@
 
 var fs = require('fs');
 var _ = require('underscore');
-var config = require('../src/config');
+var config = require('../../src/config');
 
 var localJson = new config(
         {
             module: './config_providers/json-local',
-            source: './test/setConfig.json'
+            source: './test/unit_test/setConfig.json'
         });
 
 module.exports = {
 
     setUp: function (callback) {
         // initialise test config file
-        fs.writeFile('./test/setConfig.json', JSON.stringify({
+        fs.writeFile('./test/unit_test/setConfig.json', JSON.stringify({
             'a': {
                 'config': {
                     'a': 1,

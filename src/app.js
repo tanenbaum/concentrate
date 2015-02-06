@@ -16,7 +16,7 @@ var env = process.env.NODE_ENV || 'development';
 var settings = new config(
     { 
         module: './config_providers/json-local',
-        source: './env.json'
+        source: __dirname + '/env.json'
     });
 
 if (env === 'development') {
@@ -36,13 +36,17 @@ settings.get(env).done(function (settings) {
 
     // config provider middleware
     app.use(function (req, res, next) {
-        req.provider = new config(settings.configProvider);
+        try {
+            req.provider = new config(settings.configProvider);
+        } catch (err) {
+            res.status(500).json(err);
+        }
         next();
     });
 
     app.use(require(settings.routes));
 
-    var server = app.listen(settings.port, function () {
+    var server = app.listen(process.env.Port || settings.port, function () {
 
         var host = server.address().address;
         var port = server.address().port;
