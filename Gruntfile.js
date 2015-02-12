@@ -19,7 +19,7 @@ module.exports = function(grunt) {
     },
     nodeunit: {
       unit_test: ['test/unit_test/**/*.js'],
-      server_test: ['test/server_test/**/*.js']
+      server_test: ['test/server_test/**/*Areas.js']
     },
     express: {
       options: {
@@ -66,6 +66,9 @@ module.exports = function(grunt) {
           "fizz": "buzz"
         },
         "extend": "area1"
+      },
+      "safeDelete": {
+        "config": {}
       }
     }
     ));

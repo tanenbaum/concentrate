@@ -26,4 +26,7 @@ node_modules
 
 # Users Environment Variables
 .lock-wscript
+
+# Test files
 test/setConfig.json
+someConfig.json

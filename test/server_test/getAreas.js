@@ -1,24 +1,23 @@
 /*jslint node: true */
 'use strict';
 
+var _ = require('underscore');
+
 var http = require('request-promise');
 
-var config = require('./config.json');
+var helpers = require('./helpers');
 
-var baseUrl = 'http://localhost:' + config.port;
+var baseUrl = helpers.baseUrl;
 
-var reject = function (test) {
-    return function (err) {
-        test.ok(false, err);
-        test.done();
-    };
-};
+var reject = helpers.reject;
 
 exports.getAreaNames = function (test) {
     http.get(baseUrl + '/areas')
         .auth('test', 'test')
         .then(function (body) {
-            test.deepEqual(['area1', 'area2'], JSON.parse(body));
+            var areas = JSON.parse(body);
+            test.ok(_.contains(areas, 'area1'));
+            test.ok(_.contains(areas, 'area2'));
             test.done();
         }, reject(test));
 };
@@ -37,7 +36,7 @@ exports.getArea1 = function (test) {
 exports.getArea404 = function (test) {
     http.get(baseUrl + '/areas/potato')
         .auth('test', 'test')
-        .then(reject, function (err) {
+        .then(reject(test), function (err) {
             test.equal(404, err.statusCode);
             test.done();
         });

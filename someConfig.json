@@ -1,1 +1,0 @@
-{"area1":{"config":{"foo":"bar"}},"area2":{"config":{"fizz":"buzz"},"extend":"area1"}}

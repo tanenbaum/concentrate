@@ -11,8 +11,17 @@
             "required": false
         },
         "extend": {
-            "type": "string",
-            "required": false
+            "oneOf": [
+                {
+                    "type": "string"
+                },
+                {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    } 
+                }
+            ]
         }
     }
 }

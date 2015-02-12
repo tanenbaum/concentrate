@@ -3,6 +3,7 @@
 
 var util = require('util');
 var _ = require('underscore');
+var P = require('promise');
 
 var errors = require('./errors');
 
@@ -31,9 +32,11 @@ router.route('/areas')
     .post(function (req, res) {
         var validName = req.provider.get().then(function (areas) {
             if (_.contains(areas, req.body.area)) {
+                var message = util.format('Area with name %s already exists.', req.body.area);
                 res.status(400).json({
-                    message: util.format('Area with name %s already exists.', req.body.area)
+                    message: message
                 });
+                return P.reject(message);
             }
         });
 
