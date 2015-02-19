@@ -1,4 +1,4 @@
-# Concentrate README
+# concentrate README [![Build Status](https://travis-ci.org/tanenbaum/concentrate.svg?branch=master)](https://travis-ci.org/tanenbaum/concentrate)
 
 A simple, extensible, config service. Create config areas, merge them together and extend upon your own templates.
 
